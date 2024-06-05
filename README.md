@@ -6,6 +6,15 @@ These scripts are intended to be used inside the Metashape app.
 The easiest way to use them is to clone this repository (or manually download the scripts) to the Metashape `scripts` folder within the Metashape installation directory (if the `scripts` folder does not exist, create it).
 Doing that, all the scripts will be run at the start of the Metashape app and will be available as menu items within Metashape GUI.
 
+For example, in Linux, you can clone the repository with:
+
+```bash
+cd /opt/metashape-pro (or the directory where Metashape is installed)
+mkdir scripts
+cd scripts
+git clone https://github.com/franioli/metashape_scripts.git
+```
+
 Alternatively, you can manually download the scripts and run them from them using the Metashape `tools-> run script` menu (note that some scripts depends on functions defined in other scripts, so you may need to run some scripts before others).
 
 ### Install external modules in Metashape built-in pyhton environment
