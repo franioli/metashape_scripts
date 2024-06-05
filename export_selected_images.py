@@ -6,6 +6,7 @@ from utils import check_compatibility
 
 check_compatibility(["2.0", "2.1"])
 
+
 def main():
     doc = Metashape.app.document
     if not doc:
