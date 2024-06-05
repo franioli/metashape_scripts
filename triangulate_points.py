@@ -15,7 +15,7 @@ import os
 
 import Metashape
 
-from utils import check_compatibility, getCamera, getMarker
+from utils import check_compatibility, get_camera_by_label, get_marker_by_label
 
 check_compatibility(["2.0", "2.1"])
 
@@ -48,12 +48,12 @@ def main():
     for line in content:
         c_label, m_label, x_proj, y_proj = line.split(",")
 
-        camera = getCamera(chunk, c_label)
+        camera = get_camera_by_label(chunk, c_label)
         if not camera:
             print(f"{c_label} camera not found in project")
             continue
 
-        marker = getMarker(chunk, m_label)
+        marker = get_marker_by_label(chunk, m_label)
         if not marker:
             marker = chunk.addMarker()
             marker.label = m_label
