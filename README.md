@@ -19,12 +19,22 @@ Alternatively, you can manually download the scripts and run them from them usin
 
 ### Install external modules in Metashape built-in pyhton environment
 
-If you want to install external modules in Metashape built-in python environment, you can follow the official guide [https://agisoft.freshdesk.com/support/solutions/articles/31000136860-how-to-install-external-python-module-to-metashape-professional-package](https://agisoft.freshdesk.com/support/solutions/articles/31000136860-how-to-install-external-python-module-to-metashape-professional-package)
+For some scripts, it is required to install `numpy` package in the Metashape built-in python environment
+
+If you want to install external pacakges in Metashape python environment, you can follow the official guide [official guide](https://agisoft.freshdesk.com/support/solutions/articles/31000136860-how-to-install-external-python-module-to-metashape-professional-package)
 
 For Linux:
 
 ```bash
-./metashape-pro/python/bin/python3.8 -m pip install "python_module_name"
+cd /opt/metashape-pro (or the directory where Metashape is installed)
+./python/bin/python3.9 -m pip install "python_module_name"
+```
+
+In case Linux installation doesn't work due to any reason (like ImportError: cannot import name 'HTTPSHandler') please install libssl 0.9.8 (as shown below) and repeat pip install process:
+
+```bash
+wget http://snapshot.debian.org/archive/debian/20110406T213352Z/pool/main/o/openssl098/libssl0.9.8_0.9.8o-7_amd64.deb
+sudo dpkg -i libssl0.9.8_0.9.8o-7_amd64.deb
 ```
 
 ### Issues
