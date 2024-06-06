@@ -40,4 +40,4 @@ def main():
     print(f"Images exported to {dest_path}.\n")
 
 
-Metashape.app.addMenuItem("Scripts/Export selected images", main)
+Metashape.app.addMenuItem("Scripts/Export/Selected images", main)

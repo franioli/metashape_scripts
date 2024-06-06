@@ -15,7 +15,8 @@ cd scripts
 git clone https://github.com/franioli/metashape_scripts.git
 ```
 
-Alternatively, you can manually download the scripts and run them from them using the Metashape `tools-> run script` menu (note that some scripts depends on functions defined in other scripts, so you may need to run some scripts before others).
+Alternatively, you can manually download the scripts and run them from them using the Metashape `tools-> run script` menu.
+Note, that some scripts depends on functions defined in other scripts (mostly the `utils.py` script), so you may need to run them before using other functions.
 
 ### Install external modules in Metashape built-in pyhton environment
 

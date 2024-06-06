@@ -53,4 +53,4 @@ def main():
     print(f"Calibration exported to {dest_path}.\n")
 
 
-Metashape.app.addMenuItem("Scripts/Export COLMAP calibration", main)
+Metashape.app.addMenuItem("Scripts/Export/COLMAP calibration", main)
