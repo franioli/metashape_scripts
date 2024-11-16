@@ -10,9 +10,7 @@ For example, in Linux, you can clone the repository with:
 
 ```bash
 cd /opt/metashape-pro (or the directory where Metashape is installed)
-mkdir scripts
-cd scripts
-git clone https://github.com/franioli/metashape_scripts.git
+git clone https://github.com/franioli/metashape_scripts.git ./scripts
 ```
 
 Alternatively, you can manually download the scripts and run them from them using the Metashape `tools-> run script` menu.
