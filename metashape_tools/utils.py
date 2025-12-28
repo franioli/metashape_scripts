@@ -162,7 +162,7 @@ def print_table(headers, rows):
         print(fmt.format(*r))
 
 
-###=== MAT ===###
+###=== MATH ===###
 
 
 def make_homogeneous(

@@ -1,11 +1,11 @@
 import Metashape
-from metashape_tools.io import bundler, calibration, sparse
+# from metashape_tools.io import bundler, calibration, sparse
 
 from metashape_tools import (
     camera_tools,
     incremental_alignment,
-    markers_tools,
     tie_points_tools,
+    fiducials
 )
 from metashape_tools.utils import check_compatibility
 
