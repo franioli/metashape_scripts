@@ -209,6 +209,91 @@ def export_selected_images(chunk, dest_path, copy_metadata=True):
     }
 
 
+def find_duplicate_cameras(chunk):
+    """
+    Find potential duplicate cameras by comparing filenames (case-insensitive, ignoring extension).
+    Returns list of duplicate groups: [(cam1, cam2, ...), ...]
+    """
+    import os
+    from collections import defaultdict
+
+    name_groups = defaultdict(list)
+    for cam in chunk.cameras:
+        label = cam.label or ""
+        # extract filename without extension
+        base = os.path.splitext(label.strip().lower())[0]
+        if base:
+            name_groups[base].append(cam)
+
+    # return only groups with > 1 camera
+    duplicates = [group for group in name_groups.values() if len(group) > 1]
+    return duplicates
+
+
+def remove_duplicate_cameras(chunk):
+    """
+    Remove duplicate cameras from chunk.
+    Keep the one with: (1) aligned transform, (2) most tie-point projections, (3) first in list.
+    Remove the rest.
+
+    Returns dict: {duplicates_found, removed, kept}
+    """
+    duplicates = find_duplicate_cameras(chunk)
+    if not duplicates:
+        return {"duplicates_found": 0, "removed": 0, "kept": 0}
+
+    removed = 0
+    kept = 0
+
+    print("\n" + "=" * 70)
+    print("REMOVING DUPLICATE CAMERAS")
+    print("=" * 70)
+
+    for group in duplicates:
+        # score each camera: (has_transform, tie_point_count)
+        scores = []
+        for cam in group:
+            has_transform = cam.transform is not None
+            # count projections from tie_points (simple heuristic for camera quality)
+            tie_count = 0
+            try:
+                if hasattr(chunk, "tie_points"):
+                    for proj_list in chunk.tie_points.projections.values():
+                        for proj in proj_list:
+                            if getattr(
+                                proj, "camera", None
+                            ) == cam or chunk.cameras.index(cam) == getattr(
+                                proj, "camera", None
+                            ):
+                                tie_count += 1
+            except Exception:
+                tie_count = 0
+            scores.append((cam, has_transform, tie_count))
+
+        # sort by (has_transform DESC, tie_count DESC, index ASC)
+        scores.sort(key=lambda x: (-int(x[1]), -x[2], group.index(x[0])))
+
+        # keep first, remove rest
+        keep_cam = scores[0][0]
+        remove_cams = [s[0] for s in scores[1:]]
+
+        print(f"Group: {keep_cam.label}")
+        print(f"  Keeping: {keep_cam.label} (aligned={keep_cam.transform is not None})")
+        for rc in remove_cams:
+            print(f"  Removing: {rc.label}")
+            chunk.remove(rc)
+            removed += 1
+
+        kept += 1
+
+    print(f"\nDuplicate groups found: {len(duplicates)}")
+    print(f"Cameras removed: {removed}")
+    print(f"Cameras kept: {kept}")
+    print("=" * 70)
+
+    return {"duplicates_found": len(duplicates), "removed": removed, "kept": kept}
+
+
 # ============================================================================
 # GUI DIALOG FUNCTIONS
 # ============================================================================
@@ -435,6 +520,41 @@ def export_selected_images_dialog():
     )
 
 
+def remove_duplicate_cameras_dialog():
+    """
+    GUI dialog to find and remove duplicate cameras.
+    """
+    chunk = Metashape.app.document.chunk
+    if not chunk:
+        Metashape.app.messageBox("No active chunk!")
+        return
+
+    duplicates = find_duplicate_cameras(chunk)
+    if not duplicates:
+        Metashape.app.messageBox("No duplicate cameras found.")
+        return
+
+    # show preview
+    msg = f"Found {len(duplicates)} duplicate group(s):\n\n"
+    for i, group in enumerate(duplicates[:5]):  # show first 5
+        msg += f"  Group {i + 1}: {', '.join([c.label for c in group])}\n"
+    if len(duplicates) > 5:
+        msg += f"\n  ... and {len(duplicates) - 5} more groups\n"
+    msg += "\nRemove duplicates (keeping best-aligned in each group)?"
+
+    proceed = Metashape.app.getBool(msg)
+    if not proceed:
+        return
+
+    res = remove_duplicate_cameras(chunk)
+    Metashape.app.messageBox(
+        f"Duplicate removal complete!\n\n"
+        f"Groups found: {res['duplicates_found']}\n"
+        f"Cameras removed: {res['removed']}\n"
+        f"Cameras kept: {res['kept']}"
+    )
+
+
 # ============================================================================
 # ADD TO METASHAPE MENU
 # ============================================================================
@@ -445,25 +565,25 @@ def add_menu_items():
     Add custom menu items to Metashape.
     """
     Metashape.app.addMenuItem(
-        "Custom/Camera Positions/Write Estimated to Source...",
+        "Custom/Cameras/Write Estimated to Source...",
         write_estimated_to_source_dialog,
     )
-
     Metashape.app.addMenuItem(
-        "Custom/Camera Positions/Clear Source Coordinates...",
+        "Custom/Cameras/Remove Duplicate Cameras...",
+        remove_duplicate_cameras_dialog,
+    )
+    Metashape.app.addMenuItem(
+        "Custom/Cameras/Clear Source Coordinates...",
         clear_camera_coordinates_dialog,
     )
-
     Metashape.app.addMenuItem(
-        "Custom/Camera Positions/Export Reference Data...",
+        "Custom/Cameras/Export Reference Data...",
         export_camera_reference_dialog,
     )
-
     Metashape.app.addMenuItem(
-        "Custom/Camera Positions/Export Selected Images...",
+        "Custom/Cameras/Export Selected Images...",
         export_selected_images_dialog,
     )
-
     print("Camera position tools added to menu: Custom -> Camera Positions")
 
 

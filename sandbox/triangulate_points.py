@@ -15,7 +15,7 @@ import os
 
 import Metashape
 
-from utils import check_compatibility, get_camera_by_label, get_marker_by_label
+from metashape_tools.utils import check_compatibility, get_camera_by_label, get_marker_by_label
 
 check_compatibility(["2.0", "2.1"])
 

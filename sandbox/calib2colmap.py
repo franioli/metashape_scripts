@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 
 import Metashape
 
-from utils import check_compatibility
+from metashape_tools.utils import check_compatibility
 
 check_compatibility(["2.0", "2.1"])
 

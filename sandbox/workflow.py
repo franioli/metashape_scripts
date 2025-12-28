@@ -4,7 +4,7 @@ from typing import Union
 
 import Metashape
 
-from utils import get_camera_by_label, get_marker_by_label
+from metashape_tools.utils import get_camera_by_label, get_marker_by_label
 
 """Project"""
 
