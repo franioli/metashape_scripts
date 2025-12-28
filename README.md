@@ -2,6 +2,8 @@
 
 Collection of python scripts for Metashape.
 
+## Structure
+```
 metashape_scripts/
   README.md
   LICENSE
@@ -13,7 +15,7 @@ metashape_scripts/
     markers_tools.py              # markers import/export + triangulation helpers
     incremental_alignment.py      # incremental alignment + transfer-oriented
     fiducials.py                  # Helpers for fiducial markers import
-
+```
     
 ## Use Metashape as external module
 
