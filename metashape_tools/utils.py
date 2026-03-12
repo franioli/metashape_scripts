@@ -1,4 +1,6 @@
-from typing import List, Union
+from __future__ import annotations  # ← add as very first import
+
+from typing import List, Optional, Union
 
 import Metashape
 
@@ -9,8 +11,7 @@ def check_compatibility(major_version: Union[str, List[str]]):
     Checks if the current Metashape version is compatible with the specified major version(s).
 
     Args:
-        major_version (Union[str, List[str]]): A single major version or a list of major versions to check against.
-                                               The version should be in the format 'major.minor'.
+        major_version (Union[str, List[str]]): A single major version or a list of major versions to check against. The version should be in the format 'major.minor'.
 
     Raises:
         Exception: If the current Metashape version is not compatible with any of the specified major versions.
@@ -73,7 +74,7 @@ def get_marker_by_label(chunk: Metashape.Chunk, label: str) -> Metashape.Marker:
 def get_sensor_id_by_label(
     chunk: Metashape.Chunk,
     sensor_label: str,
-) -> int:
+) -> Optional[int]:
     """
     Retrieves the sensor ID from the chunk by its label.
 
@@ -106,21 +107,21 @@ def ask_bool(prompt: str) -> bool:
     return bool(Metashape.app.getBool(prompt))
 
 
-def ask_int(prompt: str, default: int) -> int | None:
+def ask_int(prompt: str, default: int) -> Optional[int]:
     v = Metashape.app.getInt(prompt, default)
     if v is None:
         return None
     return int(v)
 
 
-def ask_float(prompt: str, default: float) -> float | None:
+def ask_float(prompt: str, default: float) -> Optional[float]:
     v = Metashape.app.getFloat(prompt, default)
     if v is None:
         return None
     return float(v)
 
 
-def ask_string(prompt: str, default: str = "") -> str | None:
+def ask_string(prompt: str, default: str = "") -> Optional[str]:
     v = Metashape.app.getString(prompt, default)
     if v is None:
         return None
