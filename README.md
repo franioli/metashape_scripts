@@ -1,4 +1,4 @@
-# Metashape scripts
+# Metashape-tools
 
 Collection of python scripts for Metashape.
 
