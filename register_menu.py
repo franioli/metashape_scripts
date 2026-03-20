@@ -4,10 +4,10 @@ from metashape_tools import (
     calibration_tools,
     camera_tools,
     chunk_tools,
-    fiducials_tools,
+    fiducial_tools,
     incremental_alignment,
     io_tools,
-    markers_tools,
+    marker_tools,
     tie_points_tools,
     triangulation,
 )
@@ -55,11 +55,11 @@ if __name__ == "__main__":
     # Markers
     Metashape.app.addMenuItem(
         "Custom/Markers/Import projections...",
-        markers_tools.import_markers_images_dialog,
+        marker_tools.import_markers_images_dialog,
     )
     Metashape.app.addMenuItem(
         "Custom/Markers/Export projections...",
-        markers_tools.export_markers_images_dialog,
+        marker_tools.export_markers_images_dialog,
     )
 
     # Incremental alignment
@@ -89,10 +89,10 @@ if __name__ == "__main__":
     # FIducials
     Metashape.app.addMenuItem(
         "Custom/Fiducials/Import from CSV...",
-        fiducials_tools.import_fiducials_from_file_dialog,
+        fiducial_tools.import_fiducials_from_file_dialog,
     )
     Metashape.app.addMenuItem(
-        "Custom/Fiducials/Add manually...", fiducials_tools.add_fiducial_manual_dialog
+        "Custom/Fiducials/Add manually...", fiducial_tools.add_fiducial_manual_dialog
     )
 
     # IO / export-import
