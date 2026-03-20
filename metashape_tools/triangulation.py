@@ -15,12 +15,13 @@ import os
 
 import Metashape
 
-from metashape_tools.utils import check_compatibility, get_camera_by_label, get_marker_by_label
+from metashape_tools.utils import (
+    get_camera_by_label,
+    get_marker_by_label,
+)
 
-check_compatibility(["2.0", "2.1"])
 
-
-def main():
+def triangulate_points():
     """
     Imports marker image coordinates from a CSV file into the current Metashape project,
     updates the transformation matrix, and exports the triangulated 3D coordinates.
@@ -75,4 +76,7 @@ def main():
     print("Triangulated coordinates exported to triangulated.csv")
 
 
-Metashape.app.addMenuItem("Scripts/Triangulate points", main)
+if __name__ == "__main__":
+    Metashape.app.addMenuItem(
+        "Custom/IO/Triangulate points from CSV...", triangulate_points
+    )

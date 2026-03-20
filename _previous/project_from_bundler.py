@@ -3,7 +3,7 @@ from pathlib import Path
 import Metashape
 
 from metashape_tools.utils import check_compatibility
-from workflow import (
+from metashape_tools.workflow import (
     import_markers,
 )
 

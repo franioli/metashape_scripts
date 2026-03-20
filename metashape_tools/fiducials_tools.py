@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import os
+from collections import defaultdict
+from typing import Optional, Union
 
 import Metashape
 
@@ -12,7 +16,7 @@ from metashape_tools.utils import (
 )
 
 
-def _find_camera(chunk: Metashape.Chunk, cam_key: str) -> Metashape.Camera | None:
+def _find_camera(chunk: Metashape.Chunk, cam_key: str) -> Optional[Metashape.Camera]:
     key = cam_key.strip().upper()
     for c in chunk.cameras:
         if (c.label or "").strip().upper() == key:
@@ -25,12 +29,12 @@ def _find_camera(chunk: Metashape.Chunk, cam_key: str) -> Metashape.Camera | Non
 
 def add_fiducial(
     chunk: Metashape.Chunk,
-    camera: Metashape.Camera | str,
+    camera: Union[Metashape.Camera, str],
     label: str,
     img_x: float,
     img_y: float,
-    world_x: float | None = None,
-    world_y: float | None = None,
+    world_x: Optional[float] = None,
+    world_y: Optional[float] = None,
     world_z: float = 1.0,
 ) -> Metashape.Marker:
     """
@@ -66,7 +70,7 @@ def read_fiducials_file(path: str, sep: str = ","):
     Returns list of dicts.
     """
     out = []
-    with open(path, "r") as f:
+    with open(path) as f:
         for raw in f:
             line = raw.strip()
             if not line or line.startswith("#"):
@@ -96,29 +100,59 @@ def read_fiducials_file(path: str, sep: str = ","):
 def import_fiducials_from_file(path: str, chunk: Metashape.Chunk) -> dict:
     """
     Imports fiducials from a file into chunk.
+    Creates ONE marker per unique label, with projections on all cameras.
+    World coordinates (reference location) are set once from the first record
+    for that label — they must be identical across all cameras for the same label.
     """
     if not os.path.isfile(path):
         raise ValueError("File not found")
 
     recs = read_fiducials_file(path)
+
+    # Group all per-camera records by fiducial label
+    by_label = defaultdict(list)
+    for r in recs:
+        by_label[r["label"]].append(r)
+
     created = 0
     skipped = 0
 
-    for r in recs:
-        cam = _find_camera(chunk, r["camera"])
-        if cam is None:
-            skipped += 1
-            continue
-        add_fiducial(
-            chunk,
-            cam,
-            r["label"],
-            r["img_x"],
-            r["img_y"],
-            r["world_x"],
-            r["world_y"],
-            r["world_z"],
+    for label, label_recs in by_label.items():
+        m = chunk.addMarker()
+        m.type = Metashape.Marker.Type.Fiducial
+        m.label = label
+
+        sensor_set = False
+        for r in label_recs:
+            cam = _find_camera(chunk, r["camera"])
+            if cam is None:
+                skipped += 1
+                continue
+
+            # Bind marker to sensor once (all cameras share the same sensor)
+            if not sensor_set:
+                m.sensor = cam.sensor
+                sensor_set = True
+
+            # Add projection for this camera
+            m.projections[cam] = Metashape.Marker.Projection(
+                Metashape.Vector([float(r["img_x"]), float(r["img_y"])]), True
+            )
+
+        # Set reference location once — world coords are identical across all cameras
+        first_with_world = next(
+            (r for r in label_recs if r["world_x"] is not None), None
         )
+        if first_with_world:
+            m.reference.location = Metashape.Vector(
+                [
+                    float(first_with_world["world_x"]),
+                    float(first_with_world["world_y"]),
+                    float(first_with_world["world_z"]),
+                ]
+            )
+            m.reference.enabled = True
+
         created += 1
 
     return {"created": created, "skipped": skipped}
@@ -184,3 +218,12 @@ def add_fiducial_manual_dialog():
 
     add_fiducial(chunk, cam, label, img_x, img_y, wx, wy, wz)
     Metashape.app.messageBox(f"Created fiducial '{label}' on '{cam.label}'.")
+
+
+if __name__ == "__main__":
+    Metashape.app.addMenuItem(
+        "Custom/Fiducials/Add Fiducial...", add_fiducial_manual_dialog
+    )
+    Metashape.app.addMenuItem(
+        "Custom/Fiducials/Import from file...", import_fiducials_from_file_dialog
+    )

@@ -1,4 +1,6 @@
-from typing import List, Union
+from __future__ import annotations
+
+from typing import List, Optional, Union
 
 import Metashape
 
@@ -94,7 +96,8 @@ def get_sensor_id_by_label(
 ### UI HELPERS ###
 
 
-def require_active_chunk():
+def require_active_chunk() -> Optional[Metashape.Chunk]:
+    """Return the active chunk, or None (with a message box) if unavailable."""
     doc = Metashape.app.document
     if not doc or not doc.chunk:
         Metashape.app.messageBox("No active chunk.")
@@ -103,24 +106,28 @@ def require_active_chunk():
 
 
 def ask_bool(prompt: str) -> bool:
+    """Show a Yes/No dialog and return the user's choice."""
     return bool(Metashape.app.getBool(prompt))
 
 
-def ask_int(prompt: str, default: int) -> int | None:
+def ask_int(prompt: str, default: int) -> Optional[int]:
+    """Prompt the user for an integer. Returns None if cancelled."""
     v = Metashape.app.getInt(prompt, default)
     if v is None:
         return None
     return int(v)
 
 
-def ask_float(prompt: str, default: float) -> float | None:
+def ask_float(prompt: str, default: float) -> Optional[float]:
+    """Prompt the user for a float. Returns None if cancelled."""
     v = Metashape.app.getFloat(prompt, default)
     if v is None:
         return None
     return float(v)
 
 
-def ask_string(prompt: str, default: str = "") -> str | None:
+def ask_string(prompt: str, default: str = "") -> Optional[str]:
+    """Prompt the user for a string. Returns None if cancelled or empty."""
     v = Metashape.app.getString(prompt, default)
     if v is None:
         return None
@@ -128,12 +135,14 @@ def ask_string(prompt: str, default: str = "") -> str | None:
     return v if v else None
 
 
-def ask_open_file(prompt: str, filter: str = "All files (*.*)") -> str | None:
+def ask_open_file(prompt: str, filter: str = "All files (*.*)") -> Optional[str]:
+    """Show an open-file dialog. Returns the selected path, or None if cancelled."""
     path = Metashape.app.getOpenFileName(prompt, filter=filter)
     return path if path else None
 
 
-def ask_save_file(prompt: str, filter: str = "All files (*.*)") -> str | None:
+def ask_save_file(prompt: str, filter: str = "All files (*.*)") -> Optional[str]:
+    """Show a save-file dialog. Returns the selected path, or None if cancelled."""
     path = Metashape.app.getSaveFileName(prompt, filter=filter)
     return path if path else None
 

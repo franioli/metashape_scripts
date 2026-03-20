@@ -412,41 +412,6 @@ def write_estimated_to_source_dialog():
     Metashape.app.messageBox(message)
 
 
-def clear_camera_coordinates_dialog():
-    """
-    Dialog to clear camera source coordinates.
-    """
-    chunk = Metashape.app.document.chunk
-
-    if not chunk:
-        Metashape.app.messageBox("No active chunk!")
-        return
-
-    # Prefer processing selected cameras when present
-    selected_cameras = [cam for cam in chunk.cameras if getattr(cam, "selected", False)]
-    cameras_to_clear = selected_cameras if selected_cameras else list(chunk.cameras)
-
-    has_source = sum(
-        1 for cam in cameras_to_clear if cam.reference.location is not None
-    )
-
-    if has_source == 0:
-        Metashape.app.messageBox(
-            "No cameras with source coordinates found in the chosen set!"
-        )
-        return
-
-    response = Metashape.app.getBool(
-        f"Clear source coordinates for {has_source} cameras?\n\n"
-        f"This will only clear coordinates in Metashape,\n"
-        f"not modify image EXIF data.\n\n"
-        f"Continue?"
-    )
-
-    if response:
-        count = clear_camera_source_coordinates(chunk, cameras=cameras_to_clear)
-        Metashape.app.messageBox(f"Cleared {count} camera source coordinates.")
-
 
 def export_camera_reference_dialog():
     """

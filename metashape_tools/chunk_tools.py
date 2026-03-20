@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import Metashape
 
 from metashape_tools.utils import ask_bool, require_active_chunk
